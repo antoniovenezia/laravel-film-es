@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 
 class HomePageController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +19,7 @@ class HomePageController extends Controller
     public function index()
     {
         $allFilms=Film::all();
-        return view('welcome', compact('allFilms'));
+        return view('films.index', compact('allFilms'));
         
     }
 
@@ -26,7 +30,7 @@ class HomePageController extends Controller
      */
     public function create()
     {
-        //
+        return view('films.create');
     }
 
     /**
@@ -37,7 +41,12 @@ class HomePageController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validateFunction($request);
+        $data=$request->all();
+        $singleFilm= new Film;
+        $this->fillAndSave($singleFilm, $data);
+     
+        return view('films.show',['singleFilm'=>$singleFilm]);
     }
 
     /**
@@ -48,8 +57,10 @@ class HomePageController extends Controller
      */
     public function show($id)
     {
-        $singleFilm=Film::find($id);
-        return view('films.show', compact('singleFilm'));
+        $film=Film::find($id);
+
+
+        return view('films.show', compact('film'));
 
     }
 
@@ -59,9 +70,10 @@ class HomePageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Film $film)
     {
-        //
+
+        return view('films.edit', compact('film'));
     }
 
     /**
@@ -71,9 +83,12 @@ class HomePageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Film $film)
     {
-        //
+        $this->validateFunction($request);
+        $data=$request->all();
+        $this->fillAndSave($film, $data);
+        return view('films.show', compact('film'));
     }
 
     /**
@@ -82,8 +97,28 @@ class HomePageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Film $film)
     {
-        //
+        $film->delete();
+        return redirect()->route('films.index');
+    }
+    private function fillAndSave(Film $film, $data){
+        $film->titolo=$data['titolo'];
+        $film->data=$data['data'];
+        $film->trama=$data['trama'];
+        $film->cast=$data['cast'];
+        $film->genere=$data['genere'];
+        $film->copertina=$data['copertina'];
+        $film->save();
+    }
+    private function validateFunction($request){
+        $request->validate([
+            'titolo'=>'required',
+            'data'=>'date',
+            'trama'=>'required | max:65500',
+            'cast'=> 'required | max:65500',
+            'genere'=>'required',
+            'copertina'=>'required'
+        ]);
     }
 }

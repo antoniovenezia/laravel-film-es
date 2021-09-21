@@ -8,8 +8,8 @@
     </head>
 
     <body>
-        <a href="{{route('films.index')}}"><button>Entra nel Sito!</button></a>
-        @foreach($allFilm as $film)
+        
+        @foreach($allFilms as $film)
             <div>
                 <h1>
                     <a href="{{ route('films.show', ['film'=>$film->id]) }}">{{ $film->titolo }}</a>
@@ -19,6 +19,12 @@
                 <p>{{ $film->cast }}</p>
                 <p>{{ $film->genere }}</p>
                 <img src="{{ $film->copertina }}" alt="copertina di {{ $film->titolo }}">
+                <button><a href="{{route('films.edit',$film)}}">EDIT</a></button>
+                <form action="{{route('films.destroy',$film)}}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit">Elimina</button>
+                </form>
             </div>
         @endforeach
 
