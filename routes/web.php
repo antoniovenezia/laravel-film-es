@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\HomePageController;
 use Illuminate\Support\Facades\Route;
-
+use App\Film;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,3 +15,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::resource('films', 'HomePageController');
+
+Auth::routes();
+
+Route::get('/', function(){
+    $allFilm= Film::all();
+    return view('welcome', compact('allFilm'));
+})->name('home');
